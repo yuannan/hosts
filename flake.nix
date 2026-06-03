@@ -47,8 +47,15 @@
                       (line:
                         let first = builtins.elemAt (lib.splitString " " line) 0;
                         in !(lib.hasInfix "%" first)
+                          && builtins.stringLength line <= 57
                       )
-                      (lib.splitString "\n" text)
+                      (map
+                        (line:
+                          let stripped = lib.removeSuffix "\r" line;
+                          in builtins.head (lib.splitString " #" stripped)
+                        )
+                        (lib.splitString "\n" text)
+                      )
                     );
                 filtered = filterHosts orig;
                 ipv6 = builtins.replaceStrings [ "0.0.0.0" ] [ "::" ] filtered;
